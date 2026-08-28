@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-cloud-50: #F7FAFF;
+  --color-cloud-100: #EEF3FC;
+  --color-cloud-200: #DCE6F7;
+  --color-cloud-300: #B9CBEA;
+  
+  --color-slate-900: #101828;
+  --color-slate-700: #3E4A5E;
+  --color-slate-500: #7488A3;
+  
+  --color-azure-100: #DCE9FE;
+  --color-azure-500: #2F6FED;
+  --color-azure-600: #1F55C4;
+  
+  --color-sky-400: #7CC2F0;
+  --color-mint-500: #2FB88C;
+  --color-amber-500: #E0A130;
+  --color-coral-500: #E0615A;
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --blur-xs: 2px;
+  --blur-glass: 18px;
+
+  --shadow-glass-sm: 0 2px 8px rgba(16,24,40,0.06), inset 0 1px 0 rgba(255,255,255,0.6);
+  --shadow-glass-md: 0 10px 28px rgba(16,24,40,0.10), inset 0 1px 0 rgba(255,255,255,0.7);
+  --shadow-glass-lg: 0 24px 56px rgba(16,24,40,0.16), inset 0 1px 0 rgba(255,255,255,0.7);
+  --shadow-raised: 0 1px 2px rgba(16,24,40,0.06), 0 4px 12px rgba(16,24,40,0.05);
+  --shadow-raised-hover: 0 6px 14px rgba(47,111,237,0.16), 0 12px 28px rgba(16,24,40,0.08);
+  --shadow-pressed: inset 0 2px 4px rgba(16,24,40,0.10);
+
+  --radius-xl2: 1.25rem;
+}
