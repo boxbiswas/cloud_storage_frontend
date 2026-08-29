@@ -21,13 +21,32 @@ const RegisterForm = () => {
       
       dispatch(setCredentials({ user: response.data.user }));
       
-      if (response.data.token) sessionStorage.setItem('sessionid', response.data.token);
-      else sessionStorage.setItem('sessionid', 'true');
+      if (response.data.token) {
+        sessionStorage.setItem('sessionid', response.data.token);
+      } else {
+        sessionStorage.setItem('sessionid', 'true');
+      }
       
-      toast.success('Account created successfully!');
-      navigate('/');
+      toast.success('Account created successfully! Please log in.');
+      navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to create account');
+      console.error('Registration failed:', err.response?.data ?? err.message ?? err);
+      let errorMessage = 'Failed to create account';
+      
+      const data = err.response?.data;
+      if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+        errorMessage = data.errors[0].message || JSON.stringify(data.errors[0]);
+      } else if (typeof data === 'string' && data) {
+        errorMessage = data;
+      } else if (data?.message) {
+        errorMessage = data.message;
+      } else if (!err.response) {
+        errorMessage = 'Could not reach the server. Make sure the backend is running.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

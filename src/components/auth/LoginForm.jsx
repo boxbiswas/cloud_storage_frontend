@@ -26,7 +26,15 @@ const LoginForm = () => {
       toast.success('Logged in successfully!');
       navigate('/');
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to login');
+      let errorMessage = 'Failed to login';
+      if (err.response?.data?.errors && err.response.data.errors.length > 0) {
+        errorMessage = err.response.data.errors[0].message;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
