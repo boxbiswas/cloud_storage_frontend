@@ -2,41 +2,38 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../redux/slices/authSlice';
+import { useLoginMutation } from '../../redux/api/authApi';
 import toast from 'react-hot-toast';
-import api from '../../https/axios';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
-      const response = await api.post('/auth/login', { email, password });
+      // RTK Query unwraps the payload or throws an error
+      const response = await login({ email, password }).unwrap();
       
-      dispatch(setCredentials({ user: response.data.user }));
+      dispatch(setCredentials({ user: response.user }));
       
-      if (response.data.token) sessionStorage.setItem('sessionid', response.data.token);
+      if (response.token) sessionStorage.setItem('sessionid', response.token);
       else sessionStorage.setItem('sessionid', 'true');
       
       toast.success('Logged in successfully!');
       navigate('/');
     } catch (err) {
       let errorMessage = 'Failed to login';
-      if (err.response?.data?.errors && err.response.data.errors.length > 0) {
-        errorMessage = err.response.data.errors[0].message;
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        errorMessage = err.message;
+      if (err.data?.errors && err.data.errors.length > 0) {
+        errorMessage = err.data.errors[0].message;
+      } else if (err.data?.message) {
+        errorMessage = err.data.message;
       }
       toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 

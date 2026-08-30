@@ -12,8 +12,13 @@ import ProtectedRoute from './components/ProtectedRoutes';
 // Layout
 import Sidebar from './components/layout/Sidebar';
 
-// Drive page
+// Pages
 import Drive from './pages/Drive';
+import Search from './pages/Search';
+import Starred from './pages/Starred';
+import Recent from './pages/Recent';
+import Shared from './pages/Shared';
+import Trash from './pages/Trash';
 
 // Upload components (global, always mounted inside the authenticated layout)
 import UploadTray from './components/upload/UploadTray';
@@ -47,9 +52,11 @@ function App() {
                     <Route path="/" element={<Drive />} />
 
                     {/* Placeholder routes — implement in future days */}
-                    <Route path="/shared"  element={<ComingSoon title="Shared with me" />} />
-                    <Route path="/starred" element={<ComingSoon title="Starred" />} />
-                    <Route path="/trash"   element={<ComingSoon title="Trash" />} />
+                    <Route path="/search" element={<Search />} />
+                    <Route path="/starred" element={<Starred />} />
+                    <Route path="/recent"  element={<Recent />} />
+                    <Route path="/shared"  element={<Shared />} />
+                    <Route path="/trash"   element={<Trash />} />
 
                     {/* Catch-all → redirect to Drive */}
                     <Route path="*" element={<Navigate to="/" replace />} />
@@ -84,9 +91,7 @@ function App() {
   );
 }
 
-/**
- * Placeholder page component for routes not yet implemented.
- */
+// We can keep ComingSoon for any future stubs
 const ComingSoon = ({ title }) => (
   <div className="flex flex-col items-center justify-center h-full text-center p-8">
     <div className="w-16 h-16 rounded-2xl bg-cloud-100 flex items-center justify-center mb-4">

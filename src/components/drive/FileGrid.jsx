@@ -2,6 +2,7 @@ import React from 'react';
 import { Folder, FileText, Image, FileSpreadsheet, File, MoreVertical } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { openContextMenu, toggleSelected } from '../../redux/slices/driveSlice';
+import StarButton from '../common/StarButton';
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -78,14 +79,17 @@ const FolderCard = ({ folder, isSelected, onDoubleClick }) => {
           <Folder size={20} className="text-amber-500" fill="currentColor" fillOpacity={0.3} />
         </div>
 
-        {/* Options button (visible on hover or selection) */}
-        <button
-          onClick={handleMoreClick}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-cloud-100 transition-all"
-          title="More options"
-        >
-          <MoreVertical size={14} />
-        </button>
+        <div className="flex items-center">
+          <StarButton item={folder} itemType="folder" />
+          {/* Options button (visible on hover or selection) */}
+          <button
+            onClick={handleMoreClick}
+            className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-cloud-100 transition-all"
+            title="More options"
+          >
+            <MoreVertical size={14} />
+          </button>
+        </div>
       </div>
 
       {/* Name */}
@@ -134,12 +138,15 @@ const FileCard = ({ file, isSelected }) => {
         >
           {getFileIcon(file.mime_type || file.mimeType)}
         </div>
-        <button
-          onClick={handleMoreClick}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-cloud-100 transition-all"
-        >
-          <MoreVertical size={14} />
-        </button>
+        <div className="flex items-center">
+          <StarButton item={file} itemType="file" />
+          <button
+            onClick={handleMoreClick}
+            className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-cloud-100 transition-all"
+          >
+            <MoreVertical size={14} />
+          </button>
+        </div>
       </div>
 
       <div>

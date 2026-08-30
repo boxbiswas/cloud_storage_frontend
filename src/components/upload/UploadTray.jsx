@@ -8,11 +8,13 @@ const UploadTray = () => {
   const { uploads, isTrayOpen } = useSelector((state) => state.upload);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  if (!isTrayOpen && uploads.length === 0) return null;
+  const uploadList = Object.values(uploads);
 
-  const activeCount = uploads.filter(u => u.status === 'UPLOADING' || u.status === 'PENDING').length;
-  const completedCount = uploads.filter(u => u.status === 'SUCCESS').length;
-  const failedCount = uploads.filter(u => u.status === 'ERROR').length;
+  if (!isTrayOpen && uploadList.length === 0) return null;
+
+  const activeCount = uploadList.filter(u => u.status === 'uploading' || u.status === 'queued').length;
+  const completedCount = uploadList.filter(u => u.status === 'completed').length;
+  const failedCount = uploadList.filter(u => u.status === 'failed' || u.status === 'cancelled').length;
 
   return (
     <div className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-3rem)] z-50 flex flex-col items-end">
@@ -31,17 +33,17 @@ const UploadTray = () => {
               {activeCount > 0 ? `Uploading ${activeCount} file${activeCount > 1 ? 's' : ''}` : 'Uploads Complete'}
             </h3>
             <p className="font-mono text-[10px] text-slate-500 mt-0.5">
-              {completedCount} completed {failedCount > 0 && `· ${failedCount} failed`}
+              {completedCount} completed {failedCount > 0 && `· ${failedCount} failed/cancelled`}
             </p>
           </div>
           
           <div className="flex items-center gap-1">
-            {completedCount > 0 && activeCount === 0 && (
+            {(completedCount > 0 || failedCount > 0) && activeCount === 0 && (
               <button 
                 onClick={() => dispatch(clearCompleted())}
                 className="text-[11px] font-semibold text-azure-600 hover:text-azure-700 px-2 py-1 mr-2"
               >
-                Clear all
+                Clear finished
               </button>
             )}
             <button 
@@ -56,10 +58,10 @@ const UploadTray = () => {
         </div>
 
         <div className="overflow-y-auto p-4 flex-1">
-          {uploads.length === 0 ? (
+          {uploadList.length === 0 ? (
             <div className="text-center py-6 text-slate-500 font-body text-sm">No active uploads</div>
           ) : (
-            uploads.map((upload) => (
+            uploadList.map((upload) => (
               <UploadItem key={upload.id} upload={upload} />
             ))
           )}

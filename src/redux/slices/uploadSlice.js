@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  uploads: [], // { id, name, size, progress, status: 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'ERROR', error: string | null }
+  // Using an object to store uploads by ID for O(1) updates
+  uploads: {},
   isTrayOpen: false,
 };
 
@@ -10,45 +11,37 @@ const uploadSlice = createSlice({
   initialState,
   reducers: {
     addUpload: (state, action) => {
-      const { id, name, size } = action.payload;
-      state.uploads.unshift({
+      const { id, fileName, size, folderId } = action.payload;
+      state.uploads[id] = {
         id,
-        name,
+        fileName,
         size,
+        folderId,
         progress: 0,
-        status: 'PENDING',
+        status: 'queued', // queued | uploading | completed | failed | cancelled
         error: null,
-      });
+      };
       state.isTrayOpen = true; // Auto-open tray when a new upload starts
+    },
+    setUploadStatus: (state, action) => {
+      const { id, status, error, progress } = action.payload;
+      if (state.uploads[id]) {
+        if (status !== undefined) state.uploads[id].status = status;
+        if (error !== undefined) state.uploads[id].error = error;
+        if (progress !== undefined) state.uploads[id].progress = progress;
+      }
     },
     updateUploadProgress: (state, action) => {
       const { id, progress } = action.payload;
-      const upload = state.uploads.find((u) => u.id === id);
-      if (upload) {
-        upload.progress = progress;
-        upload.status = 'UPLOADING';
-      }
-    },
-    setUploadSuccess: (state, action) => {
-      const { id } = action.payload;
-      const upload = state.uploads.find((u) => u.id === id);
-      if (upload) {
-        upload.progress = 100;
-        upload.status = 'SUCCESS';
-      }
-    },
-    setUploadError: (state, action) => {
-      const { id, error } = action.payload;
-      const upload = state.uploads.find((u) => u.id === id);
-      if (upload) {
-        upload.status = 'ERROR';
-        upload.error = error;
+      if (state.uploads[id]) {
+        state.uploads[id].progress = progress;
+        state.uploads[id].status = 'uploading';
       }
     },
     removeUpload: (state, action) => {
       const { id } = action.payload;
-      state.uploads = state.uploads.filter((u) => u.id !== id);
-      if (state.uploads.length === 0) {
+      delete state.uploads[id];
+      if (Object.keys(state.uploads).length === 0) {
         state.isTrayOpen = false;
       }
     },
@@ -56,8 +49,12 @@ const uploadSlice = createSlice({
       state.isTrayOpen = !state.isTrayOpen;
     },
     clearCompleted: (state) => {
-      state.uploads = state.uploads.filter((u) => u.status !== 'SUCCESS');
-      if (state.uploads.length === 0) {
+      Object.keys(state.uploads).forEach((id) => {
+        if (state.uploads[id].status === 'completed' || state.uploads[id].status === 'cancelled') {
+          delete state.uploads[id];
+        }
+      });
+      if (Object.keys(state.uploads).length === 0) {
         state.isTrayOpen = false;
       }
     }
@@ -66,9 +63,8 @@ const uploadSlice = createSlice({
 
 export const {
   addUpload,
+  setUploadStatus,
   updateUploadProgress,
-  setUploadSuccess,
-  setUploadError,
   removeUpload,
   toggleTray,
   clearCompleted,

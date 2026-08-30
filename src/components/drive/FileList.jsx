@@ -3,6 +3,7 @@ import { Folder, MoreVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { openContextMenu, toggleSelected, setSortBy } from '../../redux/slices/driveSlice';
 import { getFileIcon, formatBytes, formatDate } from './FileGrid';
+import StarButton from '../common/StarButton';
 
 /**
  * FileList - Renders folders and files in a compact table/list layout.
@@ -102,13 +103,16 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
         </td>
 
         {/* Actions */}
-        <td className="px-3 py-2.5 w-10">
-          <button
-            onClick={handleMoreClick}
-            className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-cloud-100 transition-all"
-          >
-            <MoreVertical size={14} />
-          </button>
+        <td className="px-3 py-2.5 w-16">
+          <div className="flex items-center justify-end gap-1">
+            <StarButton item={item} itemType={itemType} />
+            <button
+              onClick={handleMoreClick}
+              className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-cloud-100 transition-all"
+            >
+              <MoreVertical size={14} />
+            </button>
+          </div>
         </td>
       </tr>
     );

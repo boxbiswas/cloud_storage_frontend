@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Pencil, Trash2, FolderInput, Share2 } from 'lucide-react';
+import { Pencil, Trash2, FolderInput, Share2, Download } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { closeContextMenu } from '../../redux/slices/driveSlice';
 
@@ -14,8 +14,10 @@ import { closeContextMenu } from '../../redux/slices/driveSlice';
  *   onRename    - (item, itemType) => void
  *   onDelete    - (item, itemType) => void
  *   onMove      - (item, itemType) => void
+ *   onShare     - (item, itemType) => void
+ *   onDownload  - (item) => void
  */
-const ContextMenu = ({ menu, onRename, onDelete, onMove }) => {
+const ContextMenu = ({ menu, onRename, onDelete, onMove, onShare, onDownload }) => {
   const dispatch = useDispatch();
   const menuRef = useRef(null);
 
@@ -72,6 +74,10 @@ const ContextMenu = ({ menu, onRename, onDelete, onMove }) => {
       style={style}
       className="bg-white/90 backdrop-blur-glass border border-cloud-200 rounded-xl shadow-glass-md p-1.5 w-48 animate-in fade-in zoom-in-95 duration-100"
     >
+      {menu.itemType === 'file' && onDownload && (
+        menuItem(<Download size={14} />, 'Download', () => onDownload(menu.item))
+      )}
+      {menuItem(<Share2 size={14} />, 'Share', () => onShare && onShare(menu.item, menu.itemType))}
       {menuItem(<Pencil size={14} />, 'Rename', () => onRename(menu.item, menu.itemType))}
       {menuItem(<FolderInput size={14} />, 'Move', () => onMove(menu.item, menu.itemType))}
       

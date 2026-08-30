@@ -1,36 +1,29 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { HardDrive, Users, Star, Trash2, ChevronRight, LogOut } from 'lucide-react';
+import { HardDrive, Users, Star, Trash2, Clock, ChevronRight, LogOut, Loader2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../redux/slices/authSlice';
-import api from '../../https/axios';
+import { logout as clearAuth } from '../../redux/slices/authSlice';
+import { useLogoutMutation } from '../../redux/api/authApi';
 import toast from 'react-hot-toast';
 
-/**
- * Sidebar
- * Main navigation sidebar for CloudVault.
- * Uses NavLink for active-state styling.
- * Routes planned: /, /shared, /starred, /trash
- *
- * Props:
- *   className - additional Tailwind classes (for responsive hiding)
- */
 const Sidebar = ({ className = '' }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
 
   const navItems = [
     { to: '/',        icon: <HardDrive size={17} />,  label: 'My Drive',        end: true },
     { to: '/shared',  icon: <Users size={17} />,       label: 'Shared with me'  },
+    { to: '/recent',  icon: <Clock size={17} />,       label: 'Recent'          },
     { to: '/starred', icon: <Star size={17} />,        label: 'Starred'         },
     { to: '/trash',   icon: <Trash2 size={17} />,      label: 'Trash'           },
   ];
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout');
-      dispatch(logout());
+      await logout().unwrap();
+      dispatch(clearAuth());
       sessionStorage.removeItem('sessionid');
       navigate('/login');
       toast.success('Logged out successfully');
@@ -118,10 +111,11 @@ const Sidebar = ({ className = '' }) => {
           </div>
           <button 
             onClick={handleLogout}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-coral-500 hover:bg-coral-50 transition-colors shrink-0"
+            disabled={isLoggingOut}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-coral-500 hover:bg-coral-50 transition-colors shrink-0 disabled:opacity-50"
             title="Log out"
           >
-            <LogOut size={16} />
+            {isLoggingOut ? <Loader2 size={16} className="animate-spin" /> : <LogOut size={16} />}
           </button>
         </div>
       </div>

@@ -2,27 +2,27 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../redux/slices/authSlice';
+import { useRegisterMutation } from '../../redux/api/authApi';
 import toast from 'react-hot-toast';
-import api from '../../https/axios';
 
 const RegisterForm = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const [register, { isLoading }] = useRegisterMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
-      const response = await api.post('/auth/register', { name, email, password });
+      const response = await register({ name, email, password }).unwrap();
       
-      dispatch(setCredentials({ user: response.data.user }));
+      dispatch(setCredentials({ user: response.user }));
       
-      if (response.data.token) {
-        sessionStorage.setItem('sessionid', response.data.token);
+      if (response.token) {
+        sessionStorage.setItem('sessionid', response.token);
       } else {
         sessionStorage.setItem('sessionid', 'true');
       }
@@ -30,25 +30,20 @@ const RegisterForm = () => {
       toast.success('Account created successfully! Please log in.');
       navigate('/login');
     } catch (err) {
-      console.error('Registration failed:', err.response?.data ?? err.message ?? err);
       let errorMessage = 'Failed to create account';
       
-      const data = err.response?.data;
+      const data = err.data;
       if (data?.errors && Array.isArray(data.errors) && data.errors.length > 0) {
         errorMessage = data.errors[0].message || JSON.stringify(data.errors[0]);
       } else if (typeof data === 'string' && data) {
         errorMessage = data;
       } else if (data?.message) {
         errorMessage = data.message;
-      } else if (!err.response) {
+      } else if (err.error) {
         errorMessage = 'Could not reach the server. Make sure the backend is running.';
-      } else if (err.message) {
-        errorMessage = err.message;
       }
       
       toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 
