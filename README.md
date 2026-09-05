@@ -85,19 +85,6 @@ cd cloud_storage_frontend
 npm install
 ```
 
-### Setup
-
-Create a `.env` file based on the provided `.env.example`:
-
-```bash
-cp .env.example .env
-```
-
-Then fill in your backend URL. For local development:
-
-```
-VITE_API_URL=http://localhost:3000
-```
 
 ### Run the Development Server
 
