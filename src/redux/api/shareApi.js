@@ -44,6 +44,12 @@ export const shareApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Share'],
     }),
+    getPublicLinkDetails: builder.query({
+      query: ({ token, password }) => ({
+        url: `/link/${token}`,
+        headers: password ? { 'x-link-password': password } : {},
+      }),
+    }),
   }),
 });
 
@@ -53,4 +59,6 @@ export const {
   useDeleteShareMutation,
   useCreateLinkShareMutation,
   useDeleteLinkShareMutation,
+  useGetPublicLinkDetailsQuery,
+  useLazyGetPublicLinkDetailsQuery,
 } = shareApi;

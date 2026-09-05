@@ -4,14 +4,14 @@ import toast from 'react-hot-toast';
 import { LayoutGrid, List, FolderPlus, Upload as UploadIcon, RefreshCw, Loader2 } from 'lucide-react';
 
 // RTK Query Hooks
-import { 
-  useGetFolderContentsQuery, 
+import {
+  useGetFolderContentsQuery,
   useCreateFolderMutation,
   useRenameFolderMutation,
   useDeleteFolderMutation,
   useMoveFolderMutation
 } from '../redux/api/folderApi';
-import { 
+import {
   useRenameFileMutation,
   useDeleteFileMutation,
   useMoveFileMutation,
@@ -59,12 +59,12 @@ const Drive = () => {
   } = useSelector((state) => state.drive);
 
   // ── RTK Query Data Fetching ──
-  const { 
-    data: folderData, 
-    isLoading, 
+  const {
+    data: folderData,
+    isLoading,
     isFetching,
-    isError, 
-    refetch 
+    isError,
+    refetch
   } = useGetFolderContentsQuery(currentFolderId);
 
   // Default to empty arrays if no data
@@ -77,7 +77,7 @@ const Drive = () => {
   const [renameFolder] = useRenameFolderMutation();
   const [deleteFolder] = useDeleteFolderMutation();
   const [moveFolder] = useMoveFolderMutation();
-  
+
   const [renameFile] = useRenameFileMutation();
   const [deleteFile] = useDeleteFileMutation();
   const [moveFile] = useMoveFileMutation();
@@ -176,15 +176,15 @@ const Drive = () => {
     setActionLoading(true);
     try {
       if (itemType === 'folder') {
-        await moveFolder({ 
-          id: item.id, 
+        await moveFolder({
+          id: item.id,
           parentId: destinationFolderId,
           oldParentId: item.parentId || 'root',
           item: item // for optimistic cache
         }).unwrap();
       } else {
-        await moveFile({ 
-          id: item.id, 
+        await moveFile({
+          id: item.id,
           folderId: destinationFolderId,
           oldParentId: item.folderId || 'root',
           item: item // for optimistic cache
@@ -219,18 +219,18 @@ const Drive = () => {
       const toastId = toast.loading(`Preparing download for "${item.name}"...`);
       const response = await getDownloadUrl(item.id).unwrap();
       toast.dismiss(toastId);
-      
+
       const downloadUrl = response.signedUrl;
       if (!downloadUrl) throw new Error('No download URL returned');
-      
+
       // Trigger programmatic download
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = item.name; 
+      link.download = item.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       toast.success('Download started');
     } catch (err) {
       toast.error('Failed to download file');
@@ -243,10 +243,10 @@ const Drive = () => {
       const toastId = toast.loading(`Opening "${item.name}"...`);
       const response = await getDownloadUrl(item.id).unwrap();
       toast.dismiss(toastId);
-      
+
       const fileUrl = response.signedUrl;
       if (!fileUrl) throw new Error('No URL returned');
-      
+
       setPreviewTarget({ file: item, url: fileUrl });
       setIsPreviewOpen(true);
     } catch (err) {
@@ -338,10 +338,10 @@ const Drive = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Search */}
         <div className="w-full">
-          <SearchBar isFiltersOpen={false} onToggleFilters={() => {}} />
+          <SearchBar isFiltersOpen={false} onToggleFilters={() => { }} />
         </div>
       </div>
 
@@ -358,19 +358,9 @@ const Drive = () => {
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-24">
             <p className="text-coral-500 font-body font-medium">Failed to load folder contents</p>
-            <div className="flex gap-4 mt-3">
-              <button onClick={refetch} className="text-sm text-azure-500 hover:underline">
-                Try again
-              </button>
-              {currentFolderId && (
-                <button 
-                  onClick={() => dispatch(setCurrentFolder(null))} 
-                  className="text-sm text-slate-500 hover:underline"
-                >
-                  Go to Root
-                </button>
-              )}
-            </div>
+            <button onClick={refetch} className="mt-3 text-sm text-azure-500 hover:underline">
+              Try again
+            </button>
           </div>
         ) : (
           viewMode === 'grid' ? (
@@ -437,7 +427,7 @@ const Drive = () => {
         itemType={shareTarget?.itemType || 'item'}
       />
 
-      <FilePreviewModal 
+      <FilePreviewModal
         isOpen={isPreviewOpen}
         onClose={() => { setIsPreviewOpen(false); setPreviewTarget({ file: null, url: null }); }}
         file={previewTarget?.file}
