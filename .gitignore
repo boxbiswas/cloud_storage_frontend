@@ -25,3 +25,8 @@ dist-ssr
 
 DESIGN.md
 DESIGN.txt
+
+# Environment variables — never commit secrets
+.env
+.env.*
+!.env.example

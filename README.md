@@ -1,8 +1,12 @@
 # ☁️ CloudVault — Frontend
 
-> A premium, feature-rich cloud storage web application — the React frontend for CloudVault. Built with **React 19**, **Vite**, **Redux Toolkit (RTK Query)**, and **Tailwind CSS v4** — deployed on **Vercel**.
+> A premium, feature-rich cloud storage web application — the React frontend for CloudVault. Built with **React 19**, **Vite**, **Redux Toolkit (RTK Query)**, and **Tailwind CSS v4**.
 
-🚀 **[Live App](https://cloud-storage-frontend-phi.vercel.app)**
+<div align="center">
+
+### 🚀 [**Live App → cloud-storage-frontend-phi.vercel.app**](https://cloud-storage-frontend-phi.vercel.app)
+
+</div>
 
 ---
 
@@ -81,16 +85,19 @@ cd cloud_storage_frontend
 npm install
 ```
 
-### Environment Variables
+### Setup
 
-Create a `.env` file in the `frontend/` directory:
+Create a `.env` file based on the provided `.env.example`:
 
-```env
-# Backend API base URL (no trailing slash)
-VITE_API_URL=http://localhost:3000
+```bash
+cp .env.example .env
 ```
 
-For production, set this to your deployed backend URL (e.g., `https://cloud-storage-backend-f5xs.onrender.com`).
+Then fill in your backend URL. For local development:
+
+```
+VITE_API_URL=http://localhost:3000
+```
 
 ### Run the Development Server
 
@@ -257,31 +264,21 @@ A completely standalone page (no sidebar, no auth) for recipients of public link
 - For **files**: displays name, size, and a download button
 - For **folders**: displays a list of the folder's contents
 
-### `aclMiddleware.js` → Frontend reflection
-The UI reflects the user's role. The `Drive.jsx` page conditionally shows/hides edit actions (rename, delete, move) based on the `role` returned in the folder/file data from the backend.
-
 ---
 
 ## 🚀 Deployment (Vercel)
 
 The frontend is deployed at **[https://cloud-storage-frontend-phi.vercel.app](https://cloud-storage-frontend-phi.vercel.app)**.
 
-### Steps
+Push to the `main` branch — Vercel auto-deploys.
 
-1. Push to the `main` branch — Vercel auto-deploys.
-2. Set the environment variable in the **Vercel dashboard** → Project → Settings → Environment Variables:
+The `vercel.json` rewrite rule ensures React Router's client-side routing works correctly:
 
-   ```
-   VITE_API_URL = https://cloud-storage-backend-f5xs.onrender.com
-   ```
-
-3. The `vercel.json` rewrite rule ensures React Router's client-side routing works correctly:
-
-   ```json
-   {
-     "rewrites": [{ "source": "/(.*)", "destination": "/" }]
-   }
-   ```
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
+```
 
 ---
 
@@ -290,8 +287,7 @@ The frontend is deployed at **[https://cloud-storage-frontend-phi.vercel.app](ht
 - **File Size Limit:** 50MB per file (enforced by the backend Zod schema).
 - **Supported File Types:** JPEG, PNG, GIF, WebP (images), PDF, plain text, DOCX, XLSX.
 - **Trash Retention:** Items in trash are permanently purged from both the database and Supabase Storage after **30 days**.
-- **Storage Display:** The storage gauge in the sidebar is currently static (cosmetic). Actual usage calculation is a planned feature.
 
 ---
 
-Made with ❤️ by [Indranil Biswas](https://github.com/boxbiswas)
+Made with ❤️ by [Indrasish Biswas](https://github.com/boxbiswas)
