@@ -46,9 +46,9 @@ const PublicLinkModal = ({ isOpen, onClose, item, itemType }) => {
         payload.password = password;
       }
 
-      const link = await createLinkShare(payload).unwrap();
-      const fullUrl = `${window.location.origin}/share/${link.token}`;
-      setGeneratedLink({ ...link, url: fullUrl });
+      const response = await createLinkShare(payload).unwrap();
+      const fullUrl = `${window.location.origin}/share/${response.link.token}`;
+      setGeneratedLink({ ...response.link, url: fullUrl });
       toast.success('Public link generated!');
     } catch (err) {
       toast.error(err.data?.message || 'Failed to generate link');
