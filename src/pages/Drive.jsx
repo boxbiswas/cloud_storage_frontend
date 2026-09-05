@@ -358,9 +358,19 @@ const Drive = () => {
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-24">
             <p className="text-coral-500 font-body font-medium">Failed to load folder contents</p>
-            <button onClick={refetch} className="mt-3 text-sm text-azure-500 hover:underline">
-              Try again
-            </button>
+            <div className="flex gap-4 mt-3">
+              <button onClick={refetch} className="text-sm text-azure-500 hover:underline">
+                Try again
+              </button>
+              {currentFolderId && (
+                <button 
+                  onClick={() => dispatch(setCurrentFolder(null))} 
+                  className="text-sm text-slate-500 hover:underline"
+                >
+                  Go to Root
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           viewMode === 'grid' ? (

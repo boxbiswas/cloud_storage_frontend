@@ -70,6 +70,10 @@ const driveSlice = createSlice({
       state.contextMenu = null;
     },
   },
+  extraReducers: (builder) => {
+    // Reset state on logout
+    builder.addCase('auth/logout', () => initialState);
+  },
 });
 
 export const {
