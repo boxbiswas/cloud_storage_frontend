@@ -21,7 +21,7 @@ const Shared = () => {
 
   const handleFolderOpen = (folderId) => {
     dispatch(setCurrentFolder(folderId));
-    navigate('/');
+    navigate('/drive');
   };
 
   return (

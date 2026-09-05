@@ -25,7 +25,7 @@ const LoginForm = () => {
       else sessionStorage.setItem('sessionid', 'true');
       
       toast.success('Logged in successfully!');
-      navigate('/');
+      navigate('/drive');
     } catch (err) {
       let errorMessage = 'Failed to login';
       if (err.data?.errors && err.data.errors.length > 0) {

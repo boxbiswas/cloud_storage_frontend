@@ -26,7 +26,7 @@ const AuthCallback = () => {
           else sessionStorage.setItem('sessionid', 'true');
 
           toast.success('Successfully logged in with Google');
-          navigate('/');
+          navigate('/drive');
         } catch (err) {
           toast.error('Google authentication failed');
           navigate('/login');

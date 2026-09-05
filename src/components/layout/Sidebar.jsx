@@ -13,11 +13,11 @@ const Sidebar = ({ className = '' }) => {
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
 
   const navItems = [
-    { to: '/',        icon: <HardDrive size={17} />,  label: 'My Drive',        end: true },
-    { to: '/shared',  icon: <Users size={17} />,       label: 'Shared with me'  },
-    { to: '/recent',  icon: <Clock size={17} />,       label: 'Recent'          },
-    { to: '/starred', icon: <Star size={17} />,        label: 'Starred'         },
-    { to: '/trash',   icon: <Trash2 size={17} />,      label: 'Trash'           },
+    { to: '/drive', icon: <HardDrive size={17} />, label: 'My Drive', end: true },
+    { to: '/shared', icon: <Users size={17} />, label: 'Shared with me' },
+    { to: '/recent', icon: <Clock size={17} />, label: 'Recent' },
+    { to: '/starred', icon: <Star size={17} />, label: 'Starred' },
+    { to: '/trash', icon: <Trash2 size={17} />, label: 'Trash' },
   ];
 
   const handleLogout = async () => {
@@ -109,7 +109,7 @@ const Sidebar = ({ className = '' }) => {
               <span className="text-[10px] text-slate-500 truncate">{user?.email || ''}</span>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             disabled={isLoggingOut}
             className="p-1.5 rounded-lg text-slate-400 hover:text-coral-500 hover:bg-coral-50 transition-colors shrink-0 disabled:opacity-50"
