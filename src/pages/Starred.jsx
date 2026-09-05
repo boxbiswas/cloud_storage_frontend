@@ -3,8 +3,10 @@ import { Star, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { useSearchResourcesQuery } from '../redux/api/searchApi';
+import { useGetDownloadUrlMutation } from '../redux/api/fileApi';
 import FileGrid from '../components/drive/FileGrid';
 import SkeletonGrid from '../components/drive/SkeletonGrid';
+import FilePreviewModal from '../components/drive/FilePreviewModal';
 
 /**
  * Starred Page
@@ -12,6 +14,10 @@ import SkeletonGrid from '../components/drive/SkeletonGrid';
  */
 const Starred = () => {
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTarget, setPreviewTarget] = useState({ file: null, url: null });
+  
+  const [getDownloadUrl] = useGetDownloadUrlMutation();
   
   // Fetch starred items via RTK Query
   const { data, isLoading, isError } = useSearchResourcesQuery({ starred: true });
@@ -21,6 +27,23 @@ const Starred = () => {
 
   const loadMore = async () => {
     toast.error('Pagination merge logic requires endpoint configuration');
+  };
+
+  const handleFileOpen = async (item) => {
+    try {
+      const toastId = toast.loading(`Opening "${item.name}"...`);
+      const response = await getDownloadUrl(item.id).unwrap();
+      toast.dismiss(toastId);
+      
+      const fileUrl = response.signedUrl;
+      if (!fileUrl) throw new Error('No URL returned');
+      
+      setPreviewTarget({ file: item, url: fileUrl });
+      setIsPreviewOpen(true);
+    } catch (err) {
+      toast.error('Failed to open file');
+      console.error(err);
+    }
   };
 
   return (
@@ -64,7 +87,8 @@ const Starred = () => {
               folders={results.folders} 
               files={results.files} 
               selectedIds={[]} 
-              onFolderOpen={() => {}} 
+              onFolderOpen={() => {}}
+              onFileOpen={handleFileOpen}
             />
 
             {(pagination.nextFileCursor || pagination.nextFolderCursor) && (
@@ -82,6 +106,13 @@ const Starred = () => {
           </div>
         )}
       </div>
+
+      <FilePreviewModal 
+        isOpen={isPreviewOpen}
+        onClose={() => { setIsPreviewOpen(false); setPreviewTarget({ file: null, url: null }); }}
+        file={previewTarget?.file}
+        fileUrl={previewTarget?.url}
+      />
     </div>
   );
 };

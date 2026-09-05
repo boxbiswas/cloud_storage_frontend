@@ -99,8 +99,8 @@ const executeUpload = async (id) => {
     // The backend might return a presigned URL or expect multipart/form-data directly.
     // Assuming the PDF asks for an init step, we hit /api/files/init
     const initRes = await uploadClient.post('/files/init', {
-      filename: file.name,
-      size: file.size,
+      name: file.name,
+      sizeBytes: file.size,
       mimeType: file.type || 'application/octet-stream',
       folderId: folderId
     }, {

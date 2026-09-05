@@ -4,6 +4,7 @@ export const shareApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getShares: builder.query({
       query: ({ resourceType, resourceId }) => `/shares/${resourceType}/${resourceId}`,
+      transformResponse: (response) => response.shares,
       providesTags: (result, error, { resourceType, resourceId }) => [
         { type: 'Share', id: `${resourceType}-${resourceId}` }
       ],

@@ -42,12 +42,13 @@ export const fileApi = baseApi.injectEndpoints({
       ],
     }),
     deleteFile: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `/files/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, { parentId }) => [
-        { type: 'Folder', id: parentId || 'root' }
+        { type: 'Folder', id: parentId || 'root' },
+        'Trash'
       ],
     }),
     moveFile: builder.mutation({

@@ -21,6 +21,13 @@ export const trashApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Trash'],
     }),
+    permanentDelete: builder.mutation({
+      query: ({ resourceType, id }) => ({
+        url: `/trash/${resourceType.toLowerCase()}/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Trash'],
+    }),
   }),
 });
 
@@ -28,4 +35,5 @@ export const {
   useGetTrashQuery,
   useRestoreItemMutation,
   useEmptyTrashMutation,
+  usePermanentDeleteMutation,
 } = trashApi;

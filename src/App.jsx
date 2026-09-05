@@ -81,6 +81,8 @@ function App() {
             borderRadius: '12px',
             border: '1px solid #DCE6F7',
             boxShadow: '0 10px 28px rgba(16,24,40,0.10)',
+            maxWidth: '400px',
+            wordBreak: 'break-word',
           },
         }}
       />

@@ -3,6 +3,7 @@ import { Folder, FileText, Image, FileSpreadsheet, File, MoreVertical } from 'lu
 import { useDispatch } from 'react-redux';
 import { openContextMenu, toggleSelected } from '../../redux/slices/driveSlice';
 import StarButton from '../common/StarButton';
+import UploadDropzone from '../upload/UploadDropzone';
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -92,10 +93,14 @@ const FolderCard = ({ folder, isSelected, onDoubleClick }) => {
         </div>
       </div>
 
-      {/* Name */}
-      <p className="font-body text-sm font-medium text-slate-800 truncate" title={folder.name}>
-        {folder.name}
-      </p>
+      <div>
+        <p className="font-body text-sm font-medium text-slate-800 truncate" title={folder.name}>
+          {folder.name}
+        </p>
+        <p className="font-mono text-[11px] text-slate-400 mt-0.5 truncate" title={folder.owner?.name || 'Unknown'}>
+          {folder.owner?.name || 'Unknown'}
+        </p>
+      </div>
     </div>
   );
 };
@@ -105,7 +110,7 @@ const FolderCard = ({ folder, isSelected, onDoubleClick }) => {
 /**
  * FileCard - A grid tile for a single file.
  */
-const FileCard = ({ file, isSelected }) => {
+const FileCard = ({ file, isSelected, onDoubleClick }) => {
   const dispatch = useDispatch();
 
   const handleContextMenu = (e) => {
@@ -121,6 +126,7 @@ const FileCard = ({ file, isSelected }) => {
 
   return (
     <div
+      onDoubleClick={onDoubleClick}
       onContextMenu={handleContextMenu}
       onClick={() => dispatch(toggleSelected(file.id))}
       className={`
@@ -153,9 +159,14 @@ const FileCard = ({ file, isSelected }) => {
         <p className="font-body text-sm font-medium text-slate-800 truncate" title={file.name}>
           {file.name}
         </p>
-        <p className="font-mono text-[11px] text-slate-400 mt-0.5">
-          {formatBytes(file.size_bytes || file.sizeBytes)}
-        </p>
+        <div className="flex items-center justify-between mt-0.5">
+          <p className="font-mono text-[11px] text-slate-400">
+            {formatBytes(file.size_bytes || file.sizeBytes)}
+          </p>
+          <p className="font-mono text-[11px] text-slate-400 truncate max-w-[80px]" title={file.owner?.name || 'Unknown'}>
+            {file.owner?.name || 'Unknown'}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -171,19 +182,16 @@ const FileCard = ({ file, isSelected }) => {
  *   files         - File array
  *   selectedIds   - string[] from Redux
  *   onFolderOpen  - (folderId) => void
+ *   onFileOpen    - (file) => void
  */
-const FileGrid = ({ folders, files, selectedIds, onFolderOpen }) => {
+const FileGrid = ({ folders, files, selectedIds, onFolderOpen, onFileOpen, currentFolderId }) => {
   const hasFolders = folders.length > 0;
   const hasFiles = files.length > 0;
 
   if (!hasFolders && !hasFiles) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-cloud-100 flex items-center justify-center mb-4">
-          <Folder size={28} className="text-slate-300" />
-        </div>
-        <p className="font-body font-medium text-slate-500">This folder is empty</p>
-        <p className="font-body text-sm text-slate-400 mt-1">Upload files or create a new folder to get started</p>
+      <div className="h-full flex flex-col justify-center items-center py-12 max-w-2xl mx-auto w-full">
+        <UploadDropzone folderId={currentFolderId} />
       </div>
     );
   }
@@ -221,6 +229,7 @@ const FileGrid = ({ folders, files, selectedIds, onFolderOpen }) => {
                 key={file.id}
                 file={file}
                 isSelected={selectedIds.includes(file.id)}
+                onDoubleClick={() => onFileOpen(file)}
               />
             ))}
           </div>

@@ -46,13 +46,14 @@ export const folderApi = baseApi.injectEndpoints({
       ],
     }),
     deleteFolder: builder.mutation({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `/folders/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, { id, parentId }) => [
         { type: 'Folder', id },
-        { type: 'Folder', id: parentId || 'root' }
+        { type: 'Folder', id: parentId || 'root' },
+        'Trash'
       ],
     }),
     moveFolder: builder.mutation({

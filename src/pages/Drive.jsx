@@ -36,6 +36,8 @@ import NewFolderModal from '../components/drive/NewFolderModal';
 import RenameModal from '../components/drive/RenameModal';
 import MoveModal from '../components/drive/MoveModal';
 import ShareModal from '../components/sharing/ShareModal';
+import DeleteModal from '../components/drive/DeleteModal';
+import FilePreviewModal from '../components/drive/FilePreviewModal';
 import UploadDropzone from '../components/upload/UploadDropzone';
 import SkeletonGrid from '../components/drive/SkeletonGrid';
 
@@ -85,12 +87,18 @@ const Drive = () => {
   const [isNewFolderOpen, setIsNewFolderOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isMoveOpen, setIsMoveOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState(null); // { item, itemType }
   const [moveTarget, setMoveTarget] = useState(null); // { item, itemType }
+  const [deleteTarget, setDeleteTarget] = useState(null); // { item, itemType }
   const [shareTarget, setShareTarget] = useState(null); // { item, itemType }
   const [actionLoading, setActionLoading] = useState(false); // Used for rename/move actions
   const [showDropzone, setShowDropzone] = useState(false);
+
+  // For File Preview
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTarget, setPreviewTarget] = useState({ file: null, url: null });
 
   // ─────────────────────────────────────────────────────────────────────────
   // Navigation
@@ -136,19 +144,26 @@ const Drive = () => {
   };
 
   /** Delete the right-clicked item (soft delete) */
-  const handleDelete = async (item, itemType) => {
-    const confirmed = window.confirm(`Move "${item.name}" to trash?`);
-    if (!confirmed) return;
+  const handleDelete = (item, itemType) => {
+    setDeleteTarget({ item, itemType });
+    setIsDeleteOpen(true);
+  };
 
+  const confirmDelete = async (item, itemType) => {
     try {
+      setActionLoading(true);
       if (itemType === 'folder') {
-        await deleteFolder(item.id).unwrap();
+        await deleteFolder({ id: item.id, parentId: currentFolderId }).unwrap();
       } else {
-        await deleteFile(item.id).unwrap();
+        await deleteFile({ id: item.id, parentId: currentFolderId }).unwrap();
       }
-      toast.success(`"${item.name}" moved to trash`);
+      toast.success(`Moved "${item.name}" to trash`);
+      setIsDeleteOpen(false);
+      setDeleteTarget(null);
     } catch (err) {
       toast.error(err.data?.message || 'Delete failed');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -205,7 +220,7 @@ const Drive = () => {
       const response = await getDownloadUrl(item.id).unwrap();
       toast.dismiss(toastId);
       
-      const downloadUrl = response.url || response.downloadUrl;
+      const downloadUrl = response.signedUrl;
       if (!downloadUrl) throw new Error('No download URL returned');
       
       // Trigger programmatic download
@@ -219,6 +234,23 @@ const Drive = () => {
       toast.success('Download started');
     } catch (err) {
       toast.error('Failed to download file');
+      console.error(err);
+    }
+  };
+
+  const handleFileOpen = async (item) => {
+    try {
+      const toastId = toast.loading(`Opening "${item.name}"...`);
+      const response = await getDownloadUrl(item.id).unwrap();
+      toast.dismiss(toastId);
+      
+      const fileUrl = response.signedUrl;
+      if (!fileUrl) throw new Error('No URL returned');
+      
+      setPreviewTarget({ file: item, url: fileUrl });
+      setIsPreviewOpen(true);
+    } catch (err) {
+      toast.error('Failed to open file');
       console.error(err);
     }
   };
@@ -337,6 +369,8 @@ const Drive = () => {
               files={sortedFiles}
               selectedIds={selectedIds}
               onFolderOpen={handleFolderOpen}
+              onFileOpen={handleFileOpen}
+              currentFolderId={currentFolderId}
             />
           ) : (
             <FileList
@@ -344,6 +378,8 @@ const Drive = () => {
               files={sortedFiles}
               selectedIds={selectedIds}
               onFolderOpen={handleFolderOpen}
+              onFileOpen={handleFileOpen}
+              currentFolderId={currentFolderId}
             />
           )
         )}
@@ -389,6 +425,22 @@ const Drive = () => {
         onClose={() => { setIsShareOpen(false); setShareTarget(null); }}
         item={shareTarget?.item}
         itemType={shareTarget?.itemType || 'item'}
+      />
+
+      <FilePreviewModal 
+        isOpen={isPreviewOpen}
+        onClose={() => { setIsPreviewOpen(false); setPreviewTarget({ file: null, url: null }); }}
+        file={previewTarget?.file}
+        fileUrl={previewTarget?.url}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => { setIsDeleteOpen(false); setDeleteTarget(null); }}
+        onDelete={confirmDelete}
+        item={deleteTarget?.item}
+        itemType={deleteTarget?.itemType}
+        isLoading={actionLoading}
       />
     </div>
   );

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Trash2, Loader2, RotateCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useGetTrashQuery, useRestoreItemMutation, useEmptyTrashMutation } from '../redux/api/trashApi';
-import FileGrid from '../components/drive/FileGrid';
+import { useGetTrashQuery, useEmptyTrashMutation } from '../redux/api/trashApi';
+import TrashList from '../components/drive/TrashList';
 import SkeletonGrid from '../components/drive/SkeletonGrid';
+import DeleteModal from '../components/drive/DeleteModal';
 
 /**
  * Trash Page
@@ -12,15 +13,15 @@ import SkeletonGrid from '../components/drive/SkeletonGrid';
 const Trash = () => {
   const { data, isLoading, isError, refetch } = useGetTrashQuery();
   const [emptyTrash, { isLoading: isEmptying }] = useEmptyTrashMutation();
+  const [isEmptyModalOpen, setIsEmptyModalOpen] = React.useState(false);
   
   const results = data?.data || { folders: [], files: [] };
 
   const handleEmptyTrash = async () => {
-    if (!window.confirm('Are you sure you want to permanently delete all items in the trash? This cannot be undone.')) return;
-    
     try {
       await emptyTrash().unwrap();
       toast.success('Trash emptied successfully');
+      setIsEmptyModalOpen(false);
     } catch (err) {
       toast.error(err.data?.message || 'Failed to empty trash');
     }
@@ -40,7 +41,7 @@ const Trash = () => {
         </div>
         
         <button
-          onClick={handleEmptyTrash}
+          onClick={() => setIsEmptyModalOpen(true)}
           disabled={isEmptying || (results.folders.length === 0 && results.files.length === 0)}
           className="px-4 py-2 text-sm font-medium text-coral-600 hover:text-coral-700 hover:bg-coral-50 border border-coral-200 rounded-xl transition-all disabled:opacity-50"
         >
@@ -75,15 +76,23 @@ const Trash = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <FileGrid 
+            <TrashList 
               folders={results.folders} 
               files={results.files} 
-              selectedIds={[]} 
-              onFolderOpen={() => {}} 
             />
           </div>
         )}
       </div>
+
+      <DeleteModal
+        isOpen={isEmptyModalOpen}
+        onClose={() => setIsEmptyModalOpen(false)}
+        onDelete={handleEmptyTrash}
+        isLoading={isEmptying}
+        title="Empty Trash?"
+        description="Are you sure you want to permanently delete all items in the trash? This cannot be undone."
+        confirmText="Empty Trash"
+      />
     </div>
   );
 };

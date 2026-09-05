@@ -1,5 +1,8 @@
 import React from 'react';
 import { Users, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCurrentFolder } from '../redux/slices/driveSlice';
 import { useSearchResourcesQuery } from '../redux/api/searchApi';
 import FileGrid from '../components/drive/FileGrid';
 import SkeletonGrid from '../components/drive/SkeletonGrid';
@@ -9,14 +12,17 @@ import SkeletonGrid from '../components/drive/SkeletonGrid';
  * Displays all files and folders shared with the user.
  */
 const Shared = () => {
-  // We can fetch "Shared" by querying the search API or a dedicated share list API.
-  // For now we'll mimic the Starred approach with a placeholder query or error
-  // If your backend search API supports `shared=true`, use that. Otherwise,
-  // we'll just display a coming soon or empty state.
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   
   const { data, isLoading, isError } = useSearchResourcesQuery({ shared: true });
   
   const results = data?.data || { folders: [], files: [] };
+
+  const handleFolderOpen = (folderId) => {
+    dispatch(setCurrentFolder(folderId));
+    navigate('/');
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-cloud-50/30">
@@ -47,7 +53,12 @@ const Shared = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <FileGrid folders={results.folders} files={results.files} selectedIds={[]} onFolderOpen={() => {}} />
+            <FileGrid 
+              folders={results.folders} 
+              files={results.files} 
+              selectedIds={[]} 
+              onFolderOpen={handleFolderOpen} 
+            />
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { openContextMenu, toggleSelected, setSortBy } from '../../redux/slices/driveSlice';
 import { getFileIcon, formatBytes, formatDate } from './FileGrid';
 import StarButton from '../common/StarButton';
+import UploadDropzone from '../upload/UploadDropzone';
 
 /**
  * FileList - Renders folders and files in a compact table/list layout.
@@ -12,10 +13,10 @@ import StarButton from '../common/StarButton';
  * Props:
  *   folders       - Folder array
  *   files         - File array
- *   selectedIds   - string[]
  *   onFolderOpen  - (folderId) => void
+ *   onFileOpen    - (file) => void
  */
-const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
+const FileList = ({ folders, files, selectedIds, onFolderOpen, onFileOpen, currentFolderId }) => {
   const dispatch = useDispatch();
   const { sortBy, sortDir } = useSelector((state) => state.drive);
 
@@ -24,12 +25,8 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
 
   if (!hasFolders && !hasFiles) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-cloud-100 flex items-center justify-center mb-4">
-          <Folder size={28} className="text-slate-300" />
-        </div>
-        <p className="font-body font-medium text-slate-500">This folder is empty</p>
-        <p className="font-body text-sm text-slate-400 mt-1">Upload files or create a new folder</p>
+      <div className="h-full flex flex-col justify-center items-center py-12 max-w-2xl mx-auto w-full">
+        <UploadDropzone folderId={currentFolderId} />
       </div>
     );
   }
@@ -56,7 +53,7 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
   );
 
   /* ── Row Component (shared for both folders and files) ── */
-  const Row = ({ item, itemType, icon, size, date, onDoubleClick }) => {
+  const Row = ({ item, itemType, icon, size, date, owner, onDoubleClick }) => {
     const isSelected = selectedIds.includes(item.id);
 
     const handleContextMenu = (e) => {
@@ -102,6 +99,11 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
           {date}
         </td>
 
+        {/* Owner */}
+        <td className="px-3 py-2.5 font-body text-xs text-slate-400 whitespace-nowrap">
+          {owner}
+        </td>
+
         {/* Actions */}
         <td className="px-3 py-2.5 w-16">
           <div className="flex items-center justify-end gap-1">
@@ -126,6 +128,7 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
             <HeaderCell col="name" label="Name" className="pl-3 w-full" />
             <HeaderCell col="size" label="Size" />
             <HeaderCell col="createdAt" label="Modified" />
+            <HeaderCell col="owner" label="Owner" />
             <th className="w-10" /> {/* actions */}
           </tr>
         </thead>
@@ -139,6 +142,7 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
               icon={<Folder size={16} className="text-amber-500" fill="currentColor" fillOpacity={0.3} />}
               size="—"
               date={formatDate(folder.created_at || folder.createdAt)}
+              owner={folder.owner?.name || 'Unknown'}
               onDoubleClick={() => onFolderOpen(folder.id)}
             />
           ))}
@@ -152,6 +156,8 @@ const FileList = ({ folders, files, selectedIds, onFolderOpen }) => {
               icon={getFileIcon(file.mime_type || file.mimeType, 16)}
               size={formatBytes(file.size_bytes || file.sizeBytes)}
               date={formatDate(file.created_at || file.createdAt)}
+              owner={file.owner?.name || 'Unknown'}
+              onDoubleClick={() => onFileOpen(file)}
             />
           ))}
         </tbody>

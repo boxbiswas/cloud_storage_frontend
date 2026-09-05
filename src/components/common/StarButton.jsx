@@ -21,6 +21,9 @@ const StarButton = ({ item, itemType, isStarred: initialStarred }) => {
 
   const [isStarred, setIsStarred] = useState(determineInitialState());
   
+  React.useEffect(() => {
+    setIsStarred(determineInitialState());
+  }, [item?.stars, initialStarred]);
   const [addStar, { isLoading: isAdding }] = useAddStarMutation();
   const [removeStar, { isLoading: isRemoving }] = useRemoveStarMutation();
   const isLoading = isAdding || isRemoving;
