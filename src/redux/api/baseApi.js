@@ -17,7 +17,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
   
   // If we get a 401 Unauthorized, dispatch the logout action
-  if (result.error && result.error.status === 401) {
+  // EXCEPT for public link endpoints which return 401 when password is required/incorrect
+  if (result.error && result.error.status === 401 && !args.url?.startsWith('/link/')) {
     // Prevent redirect loop if already on login
     if (window.location.pathname !== '/login') {
       api.dispatch(logout());

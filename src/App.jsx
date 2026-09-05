@@ -34,7 +34,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        
+
         {/* Dedicated view for Public Links */}
         <Route path="/share/:token" element={<PublicLinkView />} />
 
@@ -60,9 +60,9 @@ function App() {
                     {/* Placeholder routes — implement in future days */}
                     <Route path="/search" element={<Search />} />
                     <Route path="/starred" element={<Starred />} />
-                    <Route path="/recent"  element={<Recent />} />
-                    <Route path="/shared"  element={<Shared />} />
-                    <Route path="/trash"   element={<Trash />} />
+                    <Route path="/recent" element={<Recent />} />
+                    <Route path="/shared" element={<Shared />} />
+                    <Route path="/trash" element={<Trash />} />
 
                     {/* Catch-all → redirect to Drive */}
                     <Route path="*" element={<Navigate to="/" replace />} />
