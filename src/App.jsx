@@ -46,6 +46,7 @@ function App() {
       <Routes>
         {/* ── Fully Public Routes (no auth check at all) ── */}
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
@@ -55,7 +56,7 @@ function App() {
         {/* ── Protected Routes ── */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index element={<Drive />} />
+            <Route path="/drive" element={<Drive />} />
             <Route path="/search" element={<Search />} />
             <Route path="/starred" element={<Starred />} />
             <Route path="/recent" element={<Recent />} />
